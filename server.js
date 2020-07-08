@@ -14,16 +14,6 @@ var PORT = process.env.PORT || 3000;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Read db.json from file and store to variable
-// =============================================================
-var file = fs.readFile("./db/db.json", (err, data) => {
-    if (err)
-        console.log(err);
-
-    var parsed = JSON.parse(data);
-    console.log(parsed);
-});
-
 // Routes
 // =============================================================
 
@@ -34,6 +24,19 @@ app.get("/", function(req, res) {
 
 app.get("/notes", function(req, res) {
   res.sendFile(path.join(__dirname, "public/notes.html"));
+});
+
+app.get("/api/notes", function(req, res) {
+
+    // Read db.json from file and parse the JSON data
+    fs.readFile("./db/db.json", (err, data) => {
+        if (err)
+            console.log(err);
+    
+        var parsed = JSON.parse(data);
+        console.log(parsed);
+        res.json(parsed);
+    });
 });
 
 // Starts the server to begin listening
