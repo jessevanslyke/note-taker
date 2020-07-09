@@ -50,16 +50,50 @@ app.post("/api/notes", function(req, res) {
           console.log(err);
 
       var parsed = JSON.parse(data);
-      parsed.push(req.body);
+      console.log(parsed);
+      // This will get the last ID stored and add one for the next note
+      var newId = parsed[parsed.length-1].id + 1;
+      var newObj = {
+        "id": newId,
+        "title": req.body.title,
+        "text": req.body.text
+      }
+      parsed.push(newObj);
 
       fs.writeFile("./db/db.json", JSON.stringify(parsed), (err) => {
         if (err)
           console.log(err);
     
-        console.log(req.body, "successfully written to db.json!");
+        console.log(newObj, "successfully written to db.json!");
       })
   });
-  
+
+  app.delete("/api/notes/:id", function(req, res) {
+
+    fs.readFile("./db/db.json", (err, data) => {
+      if (err)
+          console.log(err);
+
+      var parsed = JSON.parse(data);
+
+      // Find the object to delete
+      var deletedObj = parsed.find( results => results.id === parseInt(req.params.id));
+
+      // Find the position of said object
+      var arrayPos = parsed.findIndex( obj => obj.id === deletedObj.id);
+
+      // Now remove said object from the array
+      parsed.splice(arrayPos, 1);
+
+      // Finally, rewrite the new array as JSON
+      fs.writeFile("./db/db.json", JSON.stringify(parsed), (err) => {
+        if (err)
+          console.log(err);
+    
+        console.log(deletedObj, "successfully deleted from db.json!");
+      })
+    })
+  })
 })
 
 // Starts the server to begin listening
