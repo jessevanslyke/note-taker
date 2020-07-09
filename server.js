@@ -67,31 +67,31 @@ app.post("/api/notes", function(req, res) {
         console.log(newObj, "successfully written to db.json!");
       })
   });
+});
 
-  app.delete("/api/notes/:id", function(req, res) {
+app.delete("/api/notes/:id", function(req, res) {
 
-    fs.readFile("./db/db.json", (err, data) => {
+  fs.readFile("./db/db.json", (err, data) => {
+    if (err)
+        console.log(err);
+
+    var parsed = JSON.parse(data);
+
+    // Find the object to delete
+    var deletedObj = parsed.find( results => results.id === parseInt(req.params.id));
+
+    // Find the position of said object
+    var arrayPos = parsed.findIndex( obj => obj.id === deletedObj.id);
+
+    // Now remove said object from the array
+    parsed.splice(arrayPos, 1);
+
+    // Finally, rewrite the new array as JSON
+    fs.writeFile("./db/db.json", JSON.stringify(parsed), (err) => {
       if (err)
-          console.log(err);
-
-      var parsed = JSON.parse(data);
-
-      // Find the object to delete
-      var deletedObj = parsed.find( results => results.id === parseInt(req.params.id));
-
-      // Find the position of said object
-      var arrayPos = parsed.findIndex( obj => obj.id === deletedObj.id);
-
-      // Now remove said object from the array
-      parsed.splice(arrayPos, 1);
-
-      // Finally, rewrite the new array as JSON
-      fs.writeFile("./db/db.json", JSON.stringify(parsed), (err) => {
-        if (err)
-          console.log(err);
-    
-        console.log(deletedObj, "successfully deleted from db.json!");
-      })
+        console.log(err);
+  
+      console.log(deletedObj, "successfully deleted from db.json!");
     })
   })
 })
